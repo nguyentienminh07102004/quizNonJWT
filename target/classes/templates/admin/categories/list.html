@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/admin/layouts/default}">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách thể loại câu hỏi</title>
+    <link rel="stylesheet" th:href="@{/pagination/style.css}">
+</head>
+<body>
+<div layout:fragment="content">
+    <table class="table table-hover">
+        <thead class="thead-dark">
+        <tr>
+            <th>STT</th>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Code</th>
+            <th>Đánh giá</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cate, index : ${listCategories}">
+            <td th:text="${index.count}"></td>
+            <td th:text="${cate.getId()}"></td>
+            <td th:text="${cate.getName()}"></td>
+            <td th:text="${cate.getCode()}"></td>
+            <td th:text="${cate.getRating()}"></td>
+            <td>
+                <button class="btn btn-sm btn-warning mr-1 update" th:value="${cate.getId()}">Sửa</button>
+                <button class="btn btn-sm btn-danger delete" th:value="${cate.getId()}">Xoá</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <form th:action="@{/admin/categories/}" method="GET" id="formPaginationPage">
+        <input type="hidden" th:value="${pagination.getPage()}" id="currentPage" name="page">
+        <input type="hidden" th:value="${pagination.getLimit()}" id="limit" name="limit">
+        <input type="hidden" th:value="${pagination.getTotalPages()}" id="totalPages" name="totalPages">
+    </form>
+    <div class="d-flex justify-content-center">
+        <ul class="pagination-sm"></ul>
+    </div>
+</div>
+
+<div layout:fragment="file-script">
+    <script th:src="@{/pagination/script.js}"></script>
+    <script>
+        $(function () {
+            $(".pagination-sm").twbsPagination({
+                totalPages: parseInt($("#totalPages").val()),
+                visiblePages: parseInt($("#limit").val()),
+                startPage: parseInt($("#currentPage").val()),
+                onPageClick: function (event, page) {
+                    const currentPage = parseInt($("#currentPage").val());
+                    if(page !== currentPage) {
+                        $("#currentPage").val(page);
+                        $("#formPaginationPage").submit();
+                    }
+                }
+            });
+        });
+        document.querySelectorAll(".delete").forEach(button => {
+           button.addEventListener("click", (evt) => {
+               evt.preventDefault();
+               const id = button.getAttribute("value");
+               if(confirm("Bạn chắc chắn muốn xoá ?")) {
+                   $.ajax({
+                       url: `/api/admin/categories/${id}`,
+                       method: "DELETE",
+                       success: (res) => {
+                           window.location.href = "/admin/categories/";
+                       },
+                       error: (err) => {
+                           console.log(err);
+                       }
+                   });
+               }
+           })
+        });
+        document.querySelectorAll(".update").forEach(button => {
+            button.addEventListener("click", (evt) => {
+                evt.preventDefault();
+                const id = button.getAttribute("value");
+                if(confirm("Bạn chắc chắn muốn xoá ?")) {
+                    $.ajax({
+                        url: `/api/admin/categories/${id}`,
+                        method: "DELETE",
+                        success: (res) => {
+                            window.location.href = "/admin/categories/";
+                        },
+                        error: (err) => {
+                            console.log(err);
+                        }
+                    });
+                }
+            })
+        });
+    </script>
+</div>
+</body>
+</html>

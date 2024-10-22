@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/admin/layouts/default.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Tạo người dùng</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <h1>Thêm người dùng</h1>
+        <form id="UserCreateForm">
+            <div class="form-group row">
+                <div class="col-6">
+                    <label for="firstname">Họ</label>
+                    <input type="text" class="form-control" id="firstname" name="firstname" th:value="${user == null || user.getFirstname() == null ? '' : user.getFirstname()}">
+                </div>
+                <div class="col-6">
+                    <label for="lastname">Tên</label>
+                    <input type="text" class="form-control" id="lastname" name="lastname" th:value="${user == null || user.getLastname() == null ? '' : user.getLastname()}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required th:value="${user == null || user.getEmail() == null ? '' : user.getEmail()}">
+            </div>
+            <div class="form-group row">
+                <div class="col-6">
+                    <label for="password">Mật khẩu</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="col-6">
+                    <label for="rePassword">Nhập lại mật khẩu</label>
+                    <input type="password" class="form-control" id="rePassword" name="rePassword" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-6">
+                    <label for="dateOfBirth">Ngày tháng năm sinh</label>
+                    <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" th:value="${user == null || user.getDateOfBirth() == null ? '' : user.getDateOfBirth()}">
+                </div>
+                <div class="col-6">
+                    <label for="address">Đại chỉ</label>
+                    <input type="text" class="form-control" id="address" name="address" th:value="${user == null || user.getAddress() == null ? '' : user.getAddress()}">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="form-check form-check-inline col-3" th:each="role : ${roles}">
+                    <input class="form-check-input" type="checkbox" th:id="${'role_' + role.getKey()}" name="roles" th:value="${role.getKey()}">
+                    <label class="form-check-label" th:for="${'role_' + role.getKey()}" th:text="${role.getValue()}"></label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <button id="submit" class="btn btn-primary btn-block">Xác nhận</button>
+                </div>
+                <div class="col-6">
+                    <a th:href="@{/admin/users/list}" id="cancel" class="btn btn-info btn-block ml-1">Huỷ</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div layout:fragment="file-script">
+        <script>
+            $("#submit").on("click", (evt) => {
+                evt.preventDefault();
+                const dataForm = $("#UserCreateForm").serializeArray();
+                const data = {};
+                let roles = [];
+                dataForm.forEach(item => {
+                    if(item.name !== "roles") {
+                        data[item.name] = item.value;
+                    } else {
+                        roles.push(item.value);
+                    }
+                });
+                data['roles'] = roles;
+                $.ajax({
+                    url: "/api/users/register",
+                    method: "POST",
+                    data: JSON.stringify(data),
+                    contentType: "application/json",
+                    success: (res) => {
+                        window.location.href = "/admin/users/list";
+                    },
+                    error: (err) => {
+                        const message = JSON.parse(err.responseText).message;
+                        alert(message);
+                    }
+                })
+            });
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: IntelliJ IDEA
+Built-By: ADMIN
+Build-Jdk: Oracle OpenJDK 17.0.12
+Implementation-Title: quiz
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: com.quiz
+Main-Class: ${start-class}
+
